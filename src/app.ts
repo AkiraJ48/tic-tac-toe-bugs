@@ -1,19 +1,21 @@
-import { setPlayerPrompt } from "./prompts";
+import { selectPlayer, setToken } from "./prompts";
+import { Board } from "./types";
 
-const isGameOver = (board: string[][]) => false;
+const isGameOver = (board: Board) => true;
 
 async function tictactoe() {
-  const player_1 = "X";
-  const player_2 = "O";
-  const board: string[][] = [
+  const board: Board = [
     ["", "", ""],
     ["", "", ""],
     ["", "", ""],
   ];
 
-  setPlayerPrompt();
+  const player = await selectPlayer();
+  setToken({ board });
 
-  do {} while (!isGameOver(board));
+  do {
+    break;
+  } while (!isGameOver(board));
 
   console.log("Game Over!");
 }
