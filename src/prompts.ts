@@ -1,38 +1,22 @@
 import { select } from "@inquirer/prompts";
+import colors from "yoctocolors-cjs";
 import {
   createPrompt,
   isEnterKey,
+  makeTheme,
   useKeypress,
   useState,
 } from "@inquirer/core";
 import { Board } from "./types";
 
-type Player = "p1" | "p2";
-
-export const selectPlayer = async (): Promise<Player> => {
-  const answer = await select({
-    message: "Do you want to be Player 1 or Player 2",
-    choices: [
-      {
-        name: "Player 1",
-        value: "p1" as const,
-      },
-      {
-        name: "Player 2",
-        value: "p2" as const,
-      },
-    ],
-  });
-
-  return answer;
-};
-
 type SetTokenConfig = {
   board: Board;
+  icon: string;
 };
 
 const setupDisplayCoord =
-  (board: Board, cursor: string) => (xCoord: number, yCoord: number) => {
+  (board: Board, cursor: string, icon: string) =>
+  (xCoord: number, yCoord: number) => {
     if (board[yCoord][xCoord]) {
       return board[yCoord][xCoord];
     }
@@ -40,7 +24,7 @@ const setupDisplayCoord =
     const coord = `${xCoord},${yCoord}`;
 
     if (cursor === coord) {
-      return "X";
+      return icon;
     }
 
     if (board.length - 1 === yCoord) {
@@ -68,51 +52,61 @@ const setupIsPermissibleMove =
     return true;
   };
 
-export const setToken = createPrompt<Board, SetTokenConfig>((config, done) => {
-  const [xCoord, setXCoord] = useState(0);
-  const [yCoord, setYCoord] = useState(0);
-  const cursor = `${xCoord},${yCoord}`;
+export const setToken = createPrompt<[number, number], SetTokenConfig>(
+  (config, done) => {
+    const theme = makeTheme({
+      style: { highlight: (text: string) => colors.cyan(text) },
+    });
+    const [xCoord, setXCoord] = useState(0);
+    const [yCoord, setYCoord] = useState(0);
+    const cursor = `${xCoord},${yCoord}`;
 
-  const isPermissibleMove = setupIsPermissibleMove(
-    config.board,
-    config.board.length
-  );
+    const isPermissibleMove = setupIsPermissibleMove(
+      config.board,
+      config.board.length
+    );
 
-  const displayCoord = setupDisplayCoord(config.board, cursor);
+    const displayCoord = setupDisplayCoord(
+      config.board,
+      cursor,
+      theme.style.highlight(config.icon)
+    );
 
-  useKeypress((key, rl) => {
-    rl.clearLine(0);
+    useKeypress((key, rl) => {
+      rl.clearLine(0);
 
-    switch (key.name) {
-      case "enter":
-        done(config.board);
-        break;
-      case "left":
-        if (isPermissibleMove(xCoord - 1, yCoord)) {
-          setXCoord(xCoord - 1);
-        }
-        break;
-      case "right":
-        if (isPermissibleMove(xCoord + 1, yCoord)) {
-          setXCoord(xCoord + 1);
-        }
-        break;
-      case "up":
-        if (isPermissibleMove(xCoord, yCoord - 1)) {
-          setYCoord(yCoord - 1);
-        }
-        break;
-      case "down":
-        if (isPermissibleMove(xCoord, yCoord + 1)) {
-          setYCoord(yCoord + 1);
-        }
-        break;
-    }
-  });
+      if (isEnterKey(key)) {
+        done([xCoord, yCoord]);
+      }
 
-  return `
+      switch (key.name) {
+        case "left":
+          if (isPermissibleMove(xCoord - 1, yCoord)) {
+            setXCoord(xCoord - 1);
+          }
+          break;
+        case "right":
+          if (isPermissibleMove(xCoord + 1, yCoord)) {
+            setXCoord(xCoord + 1);
+          }
+          break;
+        case "up":
+          if (isPermissibleMove(xCoord, yCoord - 1)) {
+            setYCoord(yCoord - 1);
+          }
+          break;
+        case "down":
+          if (isPermissibleMove(xCoord, yCoord + 1)) {
+            setYCoord(yCoord + 1);
+          }
+          break;
+      }
+    });
+
+    return `
     ${displayCoord(0, 0)}|${displayCoord(1, 0)}|${displayCoord(2, 0)}
     ${displayCoord(0, 1)}|${displayCoord(1, 1)}|${displayCoord(2, 1)}
     ${displayCoord(0, 2)}|${displayCoord(1, 2)}|${displayCoord(2, 2)}
   `;
-});
+  }
+);

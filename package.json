@@ -21,6 +21,7 @@
     "typescript": "5.8.3"
   },
   "dependencies": {
-    "@inquirer/core": "10.1.13"
+    "@inquirer/core": "10.1.13",
+    "yoctocolors-cjs": "^2.1.2"
   }
 }

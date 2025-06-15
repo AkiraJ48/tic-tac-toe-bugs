@@ -11,6 +11,9 @@ importers:
       '@inquirer/core':
         specifier: 10.1.13
         version: 10.1.13(@types/node@22.15.26)
+      yoctocolors-cjs:
+        specifier: ^2.1.2
+        version: 2.1.2
     devDependencies:
       '@bartheleway/inquirer-table-multiple':
         specifier: 1.0.1
