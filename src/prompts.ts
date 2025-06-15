@@ -1,4 +1,3 @@
-import { select } from "@inquirer/prompts";
 import colors from "yoctocolors-cjs";
 import {
   createPrompt,
@@ -15,16 +14,23 @@ type SetTokenConfig = {
 };
 
 const setupDisplayCoord =
-  (board: Board, cursor: string, icon: string) =>
+  (board: Board, cursor: string, playerIcon: string) =>
   (xCoord: number, yCoord: number) => {
-    if (board[yCoord][xCoord]) {
-      return board[yCoord][xCoord];
+    const permissibleTheme = makeTheme({ style: permissibleMove });
+    const nonPermissibleTheme = makeTheme({ style: nonPermissibleMove });
+    const existingPlayerIcon = board[yCoord][xCoord];
+    const coordinate = `${xCoord},${yCoord}`;
+
+    if (cursor === coordinate) {
+      if (existingPlayerIcon) {
+        return nonPermissibleTheme.style.highlight(existingPlayerIcon);
+      }
+
+      return permissibleTheme.style.highlight(playerIcon);
     }
 
-    const coord = `${xCoord},${yCoord}`;
-
-    if (cursor === coord) {
-      return icon;
+    if (existingPlayerIcon) {
+      return existingPlayerIcon;
     }
 
     if (board.length - 1 === yCoord) {
@@ -35,8 +41,8 @@ const setupDisplayCoord =
   };
 
 const setupIsPermissibleMove =
-  (board: Board, maxBoardLength: number) =>
-  (xCoord: number, yCoord: number) => {
+  (board: Board) => (xCoord: number, yCoord: number) => {
+    const maxBoardLength = board.length;
     if (xCoord < 0 || yCoord < 0) {
       return false;
     }
@@ -45,37 +51,38 @@ const setupIsPermissibleMove =
       return false;
     }
 
-    if (board[yCoord][xCoord]) {
-      return false;
-    }
-
     return true;
   };
 
+const isPermissiblePlacement = (
+  board: Board,
+  xCoord: number,
+  yCoord: number
+) => {
+  return !Boolean(board[yCoord][xCoord]);
+};
+
+const nonPermissibleMove = { highlight: (text: string) => colors.red(text) };
+const permissibleMove = { highlight: (text: string) => colors.cyan(text) };
+
 export const setToken = createPrompt<[number, number], SetTokenConfig>(
   (config, done) => {
-    const theme = makeTheme({
-      style: { highlight: (text: string) => colors.cyan(text) },
-    });
     const [xCoord, setXCoord] = useState(0);
     const [yCoord, setYCoord] = useState(0);
     const cursor = `${xCoord},${yCoord}`;
 
-    const isPermissibleMove = setupIsPermissibleMove(
+    const isPermisslbePlacement = isPermissiblePlacement(
       config.board,
-      config.board.length
+      xCoord,
+      yCoord
     );
-
-    const displayCoord = setupDisplayCoord(
-      config.board,
-      cursor,
-      theme.style.highlight(config.icon)
-    );
+    const isPermissibleMove = setupIsPermissibleMove(config.board);
+    const displayCoord = setupDisplayCoord(config.board, cursor, config.icon);
 
     useKeypress((key, rl) => {
       rl.clearLine(0);
 
-      if (isEnterKey(key)) {
+      if (isEnterKey(key) && isPermisslbePlacement) {
         done([xCoord, yCoord]);
       }
 
