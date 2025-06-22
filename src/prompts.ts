@@ -27,14 +27,14 @@ export const playAgain = async () => {
     choices: [
       {
         name: "Yes",
-        value: "Yes",
+        value: "true",
       },
       {
         name: "No",
-        value: "No",
+        value: "false",
       },
     ],
-  } as const);
+  });
 };
 
 export const setupPlayers = async () => {

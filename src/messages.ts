@@ -7,3 +7,16 @@ export const firstPlayerTurnMessage = (isFirstPlayer: boolean) => {
 
   console.log(`${message}\n`);
 };
+
+export const winningMessage = (type: string, name: string) => {
+  const message = `The ${type} has won! Well done ${name.toLocaleUpperCase()}\n`;
+  console.log(message);
+};
+
+export const drawMessage = () => {
+  console.log("The game is a draw!\n");
+};
+
+export const gameOverMessage = () => {
+  console.log("Game Over!\n");
+};
