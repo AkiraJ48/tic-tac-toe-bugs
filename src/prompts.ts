@@ -6,11 +6,30 @@ import {
   useKeypress,
   useState,
 } from "@inquirer/core";
-import { Board } from "./types";
+import { select } from "@inquirer/prompts";
+import { Board } from "./board";
 
 type SetTokenConfig = {
   board: Board;
   icon: string;
+};
+
+export const getPlayer = async () => {
+  return select({
+    message: "Select your player",
+    choices: [
+      {
+        name: "Player 1",
+        value: "P1" as const,
+        description: "Player 1 has the first move and uses the token X",
+      },
+      {
+        name: "Player 2",
+        value: "P2" as const,
+        description: "Player 2 has the second move and uses the token O",
+      },
+    ],
+  });
 };
 
 const setupDisplayCoord =
@@ -54,14 +73,6 @@ const setupIsPermissibleMove =
     return true;
   };
 
-const isPermissiblePlacement = (
-  board: Board,
-  xCoord: number,
-  yCoord: number
-) => {
-  return !Boolean(board[yCoord][xCoord]);
-};
-
 const nonPermissibleMove = { highlight: (text: string) => colors.red(text) };
 const permissibleMove = { highlight: (text: string) => colors.cyan(text) };
 
@@ -71,18 +82,14 @@ export const setToken = createPrompt<[number, number], SetTokenConfig>(
     const [yCoord, setYCoord] = useState(0);
     const cursor = `${xCoord},${yCoord}`;
 
-    const isPermisslbePlacement = isPermissiblePlacement(
-      config.board,
-      xCoord,
-      yCoord
-    );
+    const isPermissiblePlacement = !Boolean(config.board[yCoord][xCoord]);
     const isPermissibleMove = setupIsPermissibleMove(config.board);
     const displayCoord = setupDisplayCoord(config.board, cursor, config.icon);
 
     useKeypress((key, rl) => {
       rl.clearLine(0);
 
-      if (isEnterKey(key) && isPermisslbePlacement) {
+      if (isEnterKey(key) && isPermissiblePlacement) {
         done([xCoord, yCoord]);
       }
 

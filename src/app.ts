@@ -1,59 +1,55 @@
-import { setToken } from "./prompts";
-import { Board } from "./types";
+import { createBoard } from "./board";
+import { welcomeMessage } from "./messages";
+import { getPlayer, setToken } from "./prompts";
+
+import { hasStraightLine, isDraw } from "./win";
 
 type PlayerIcon = "X" | "O";
 const getCurrentPlayerIcon = (player: PlayerIcon): PlayerIcon =>
   player === "X" ? "O" : "X";
 
-const hasStraightLine = (board: Board): string | null => {
-  const size = board.length;
-
-  // Check rows
-  for (let i = 0; i < size; i++) {
-    if (board[i][0] && board[i].every((cell) => cell === board[i][0])) {
-      return board[i][0];
-    }
-  }
-  // Check columns
-  for (let j = 0; j < size; j++) {
-    if (board[0][j] && board.every((row) => row[j] === board[0][j])) {
-      return board[0][j];
-    }
-  }
-  // Check main diagonal
-  if (board[0][0] && board.every((row, idx) => row[idx] === board[0][0])) {
-    return board[0][0];
-  }
-  // Check anti-diagonal
-  if (
-    board[0][size - 1] &&
-    board.every((row, idx) => row[size - 1 - idx] === board[0][size - 1])
-  ) {
-    return board[0][size - 1];
-  }
-  return null;
-};
+type CurrentPlayer = "Player" | "Bot";
 
 async function tictactoe() {
-  const board: Board = [
-    ["", "", ""],
-    ["", "", ""],
-    ["", "", ""],
-  ];
+  welcomeMessage();
 
+  const board = createBoard();
+  const player = await getPlayer();
+
+  
+
+  if (player === "P1") {
+    console.log("You will make the first move");
+  } else {
+    console.log("The computer will make the first move");
+  }
+
+  let currentPlayer: CurrentPlayer = player === "P1" ? "Player" : "Bot";
   let gameOver = false;
   let playerIcon = getCurrentPlayerIcon("O");
   do {
-    const [xCoord, yCoord] = await setToken({
-      board,
-      icon: playerIcon,
-    });
+    if (currentPlayer === "Player") {
+      const [xCoord, yCoord] = await setToken({
+        board,
+        icon: playerIcon,
+      });
 
-    board[yCoord][xCoord] = playerIcon;
+      board[yCoord][xCoord] = playerIcon;
+    } else {
+    }
 
-    const winner = hasStraightLine(board);
+    // @TODO: Make this return either player1 or player2
+    // @TODO: Do more assetions so its not strange this is the only one....
+    const winner = hasStraightLine(board) as string;
     if (winner) {
       console.log(`Winner is ${winner}`);
+      gameOver = true;
+      break;
+    }
+
+    if (isDraw(board)) {
+      // @TODO: Then do a string function on winner
+      console.log(`Its a draw! So ${winner} does not win!`);
       gameOver = true;
       break;
     }
