@@ -1,45 +1,37 @@
 import { createBoard } from "./board";
-import { welcomeMessage } from "./messages";
-import { getPlayer, setToken } from "./prompts";
+import { pickRandomPosition } from "./bot";
+import { firstPlayerTurnMessage, welcomeMessage } from "./messages";
+import { setupPlayers, choosePosition, Player } from "./prompts";
 
 import { hasStraightLine, isDraw } from "./win";
-
-type PlayerIcon = "X" | "O";
-const getCurrentPlayerIcon = (player: PlayerIcon): PlayerIcon =>
-  player === "X" ? "O" : "X";
-
-type CurrentPlayer = "Player" | "Bot";
 
 async function tictactoe() {
   welcomeMessage();
 
   const board = createBoard();
-  const player = await getPlayer();
+  const { firstPlayer, secondPlayer } = await setupPlayers();
 
-  
+  firstPlayerTurnMessage(firstPlayer.type === "Human");
 
-  if (player === "P1") {
-    console.log("You will make the first move");
-  } else {
-    console.log("The computer will make the first move");
-  }
-
-  let currentPlayer: CurrentPlayer = player === "P1" ? "Player" : "Bot";
+  let currentPlayer = firstPlayer;
   let gameOver = false;
-  let playerIcon = getCurrentPlayerIcon("O");
-  do {
-    if (currentPlayer === "Player") {
-      const [xCoord, yCoord] = await setToken({
-        board,
-        icon: playerIcon,
-      });
 
-      board[yCoord][xCoord] = playerIcon;
-    } else {
+  do {
+    switch (currentPlayer.type) {
+      case "Human":
+        const [xCoord, yCoord] = await choosePosition({
+          board,
+          icon: currentPlayer.token,
+        });
+
+        board[yCoord][xCoord] = currentPlayer.token;
+        break;
+      case "Bot":
+        const [x, y] = pickRandomPosition(board);
+        board[y][x] = currentPlayer.token;
+        break;
     }
 
-    // @TODO: Make this return either player1 or player2
-    // @TODO: Do more assetions so its not strange this is the only one....
     const winner = hasStraightLine(board) as string;
     if (winner) {
       console.log(`Winner is ${winner}`);
@@ -54,7 +46,7 @@ async function tictactoe() {
       break;
     }
 
-    playerIcon = getCurrentPlayerIcon(playerIcon);
+    currentPlayer = currentPlayer.id === "1" ? secondPlayer : firstPlayer;
   } while (!gameOver);
 
   console.log("Game Over!");

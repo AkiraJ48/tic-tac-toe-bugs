@@ -1,5 +1,12 @@
-// Returns a random element from a non-empty array
-export const pickRandom = <T>(arr: T[]): T => {
-  const idx = Math.floor(Math.random() * arr.length);
-  return arr[idx];
+import { Board, getEmptyCoords } from "./board";
+
+export const pickRandomPosition = (board: Board): [number, number] => {
+  const emptyCoordinates = getEmptyCoords(board);
+
+  if (emptyCoordinates.length === 0) {
+    throw new Error("No empty cells available");
+  }
+
+  const idx = Math.floor(Math.random() * emptyCoordinates.length);
+  return emptyCoordinates[idx];
 };

@@ -14,8 +14,14 @@ type SetTokenConfig = {
   icon: string;
 };
 
-export const getPlayer = async () => {
-  return select({
+export type Player = {
+  id: "1" | "2";
+  type: "Human" | "Bot";
+  token: "X" | "O";
+};
+
+export const setupPlayers = async () => {
+  const selectedPlayer = await select({
     message: "Select your player",
     choices: [
       {
@@ -30,6 +36,19 @@ export const getPlayer = async () => {
       },
     ],
   });
+
+  return {
+    firstPlayer: {
+      id: "1",
+      type: selectedPlayer === "P1" ? "Human" : "Bot",
+      token: "X",
+    } as Player,
+    secondPlayer: {
+      id: "2",
+      type: selectedPlayer === "P2" ? "Human" : "Bot",
+      token: "O",
+    } as Player,
+  };
 };
 
 const setupDisplayCoord =
@@ -76,7 +95,7 @@ const setupIsPermissibleMove =
 const nonPermissibleMove = { highlight: (text: string) => colors.red(text) };
 const permissibleMove = { highlight: (text: string) => colors.cyan(text) };
 
-export const setToken = createPrompt<[number, number], SetTokenConfig>(
+export const choosePosition = createPrompt<[number, number], SetTokenConfig>(
   (config, done) => {
     const [xCoord, setXCoord] = useState(0);
     const [yCoord, setYCoord] = useState(0);
