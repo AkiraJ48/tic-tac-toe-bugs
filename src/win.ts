@@ -1,32 +1,58 @@
 import { Board } from "./board";
+import { Player } from "./prompts";
 
-export const hasStraightLine = (board: Board) => {
+const hasStraightLine = (board: Board, token: string) => {
   const size = board.length;
 
   // Check rows
   for (let i = 0; i < size; i++) {
-    if (board[i][0] && board[i].every((cell) => cell === board[i][0])) {
-      return board[i][0];
+    if (board[i].every((cell) => cell === token)) {
+      return true;
     }
   }
   // Check columns
   for (let j = 0; j < size; j++) {
-    if (board[0][j] && board.every((row) => row[j] === board[0][j])) {
-      return board[0][j];
+    if (board.every((row) => row[j] === token)) {
+      return true;
     }
   }
   // Check main diagonal
-  if (board[0][0] && board.every((row, idx) => row[idx] === board[0][0])) {
-    return board[0][0];
+  if (board.every((row, idx) => row[idx] === token)) {
+    return true;
   }
   // Check anti-diagonal
-  if (
-    board[0][size - 1] &&
-    board.every((row, idx) => row[size - 1 - idx] === board[0][size - 1])
-  ) {
-    return board[0][size - 1];
+  if (board.every((row, idx) => row[size - 1 - idx] === token)) {
+    return true;
   }
+
+  return false;
 };
 
-export const isDraw = (board: Board) =>
+const hasHumanWon = (board: Board, humanToken: string) =>
+  hasStraightLine(board, humanToken);
+
+const hasBotWon = (board: Board, botToken: string) =>
+  hasStraightLine(board, botToken);
+
+const isDraw = (board: Board) =>
   board.every((column) => column.every((row) => Boolean(row)));
+
+export const getWinner = (
+  board: Board,
+  firstPlayer: Player,
+  secondPlayer: Player
+) => {
+  const humanToken =
+    firstPlayer.type === "Human" ? firstPlayer.token : secondPlayer.token;
+
+  const botToken =
+    firstPlayer.type === "Bot" ? firstPlayer.token : secondPlayer.token;
+
+  if (hasHumanWon(board, humanToken)) {
+    return "Human";
+  } else if (hasBotWon(board, botToken)) {
+    return "Bot";
+  } else if (isDraw(board)) {
+    throw new Error("Neither the human or bot has won");
+  }
+};

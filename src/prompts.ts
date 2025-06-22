@@ -6,7 +6,7 @@ import {
   useKeypress,
   useState,
 } from "@inquirer/core";
-import { select } from "@inquirer/prompts";
+import { input, select } from "@inquirer/prompts";
 import { Board } from "./board";
 
 type SetTokenConfig = {
@@ -18,6 +18,7 @@ export type Player = {
   id: "1" | "2";
   type: "Human" | "Bot";
   token: "X" | "O";
+  name: string;
 };
 
 export const setupPlayers = async () => {
@@ -37,16 +38,20 @@ export const setupPlayers = async () => {
     ],
   });
 
+  const name = await input({ message: "Please enter your name" });
+
   return {
     firstPlayer: {
       id: "1",
       type: selectedPlayer === "P1" ? "Human" : "Bot",
       token: "X",
+      name: selectedPlayer === "P1" ? name : undefined,
     } as Player,
     secondPlayer: {
       id: "2",
       type: selectedPlayer === "P2" ? "Human" : "Bot",
       token: "O",
+      name: selectedPlayer === "P2" ? name : undefined,
     } as Player,
   };
 };

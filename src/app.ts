@@ -1,9 +1,8 @@
 import { createBoard } from "./board";
 import { pickRandomPosition } from "./bot";
 import { firstPlayerTurnMessage, welcomeMessage } from "./messages";
-import { setupPlayers, choosePosition, Player } from "./prompts";
-
-import { hasStraightLine, isDraw } from "./win";
+import { setupPlayers, choosePosition } from "./prompts";
+import { getWinner } from "./win";
 
 async function tictactoe() {
   welcomeMessage();
@@ -16,38 +15,36 @@ async function tictactoe() {
   let currentPlayer = firstPlayer;
   let gameOver = false;
 
-  do {
-    switch (currentPlayer.type) {
-      case "Human":
-        const [xCoord, yCoord] = await choosePosition({
-          board,
-          icon: currentPlayer.token,
-        });
+  try {
+    do {
+      switch (currentPlayer.type) {
+        case "Human":
+          const [xCoord, yCoord] = await choosePosition({
+            board,
+            icon: currentPlayer.token,
+          });
 
-        board[yCoord][xCoord] = currentPlayer.token;
-        break;
-      case "Bot":
-        const [x, y] = pickRandomPosition(board);
-        board[y][x] = currentPlayer.token;
-        break;
-    }
+          board[yCoord][xCoord] = currentPlayer.token;
+          break;
+        case "Bot":
+          const [x, y] = pickRandomPosition(board);
+          board[y][x] = currentPlayer.token;
+          break;
+      }
 
-    const winner = hasStraightLine(board) as string;
-    if (winner) {
-      console.log(`Winner is ${winner}`);
-      gameOver = true;
-      break;
-    }
+      const winner = getWinner(board, firstPlayer, secondPlayer);
 
-    if (isDraw(board)) {
-      // @TODO: Then do a string function on winner
-      console.log(`Its a draw! So ${winner} does not win!`);
-      gameOver = true;
-      break;
-    }
+      if (winner) {
+        const message = `The ${winner} has won! Well done ${currentPlayer.name.toLocaleUpperCase()}`;
+        console.log(message);
+        gameOver = true;
+      }
 
-    currentPlayer = currentPlayer.id === "1" ? secondPlayer : firstPlayer;
-  } while (!gameOver);
+      currentPlayer = currentPlayer.id === "1" ? secondPlayer : firstPlayer;
+    } while (!gameOver);
+  } catch (err) {
+    // do something async here but return it
+  }
 
   console.log("Game Over!");
 }

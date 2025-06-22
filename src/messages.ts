@@ -1,5 +1,3 @@
-import { CurrentPlayer } from "./types";
-
 export const welcomeMessage = () => console.log("Welcome to Tic Tac Toe...\n");
 
 export const firstPlayerTurnMessage = (isFirstPlayer: boolean) => {
