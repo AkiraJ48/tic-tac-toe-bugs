@@ -21,6 +21,22 @@ export type Player = {
   name: string;
 };
 
+export const playAgain = async () => {
+  return select({
+    message: "Would you like to play again",
+    choices: [
+      {
+        name: "Yes",
+        value: "Yes",
+      },
+      {
+        name: "No",
+        value: "No",
+      },
+    ],
+  } as const);
+};
+
 export const setupPlayers = async () => {
   const selectedPlayer = await select({
     message: "Select your player",

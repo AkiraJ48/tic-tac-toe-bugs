@@ -1,5 +1,6 @@
 import { Board } from "./board";
 import { Player } from "./prompts";
+import { GameStatus } from "./types";
 
 const hasStraightLine = (board: Board, token: string) => {
   const size = board.length;
@@ -37,11 +38,11 @@ const hasBotWon = (board: Board, botToken: string) =>
 const isDraw = (board: Board) =>
   board.every((column) => column.every((row) => Boolean(row)));
 
-export const getWinner = (
+export const getWinner = async (
   board: Board,
   firstPlayer: Player,
   secondPlayer: Player
-) => {
+): Promise<GameStatus | undefined> => {
   const humanToken =
     firstPlayer.type === "Human" ? firstPlayer.token : secondPlayer.token;
 
@@ -49,9 +50,9 @@ export const getWinner = (
     firstPlayer.type === "Bot" ? firstPlayer.token : secondPlayer.token;
 
   if (hasHumanWon(board, humanToken)) {
-    return "Human";
+    return { status: "Win", type: "Human" };
   } else if (hasBotWon(board, botToken)) {
-    return "Bot";
+    return { status: "Win", type: "Bot" };
   } else if (isDraw(board)) {
     throw new Error("Neither the human or bot has won");
   }
