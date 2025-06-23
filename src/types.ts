@@ -6,3 +6,10 @@ export type GameStatus =
       type: string;
     }
   | { status: "Draw"; playAgain: string };
+
+export type Player = {
+  id: "1" | "2";
+  type: "Human" | "Bot";
+  token: "X" | "O";
+  name: string;
+};

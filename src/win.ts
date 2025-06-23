@@ -1,6 +1,7 @@
 import { Board } from "./board";
-import { Player } from "./prompts";
-import { GameStatus } from "./types";
+import { Draw } from "./errors";
+
+import { GameStatus, Player } from "./types";
 
 const hasStraightLine = (board: Board, token: string) => {
   const size = board.length;
@@ -54,6 +55,6 @@ export const getWinner = async (
   } else if (hasBotWon(board, botToken)) {
     return { status: "Win", type: "Bot" };
   } else if (isDraw(board)) {
-    throw new Error("Neither the human or bot has won");
+    throw new Draw("Neither the human or bot has won");
   }
 };

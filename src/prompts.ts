@@ -8,17 +8,11 @@ import {
 } from "@inquirer/core";
 import { input, select } from "@inquirer/prompts";
 import { Board } from "./board";
+import { Player } from "./types";
 
 type SetTokenConfig = {
   board: Board;
   icon: string;
-};
-
-export type Player = {
-  id: "1" | "2";
-  type: "Human" | "Bot";
-  token: "X" | "O";
-  name: string;
 };
 
 export const playAgain = async () => {

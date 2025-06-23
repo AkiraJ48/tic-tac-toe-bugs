@@ -1,5 +1,6 @@
 import { Board, createBoard } from "./board";
 import { pickRandomPosition } from "./bot";
+import { Draw } from "./errors";
 import {
   drawMessage,
   firstPlayerTurnMessage,
@@ -7,8 +8,8 @@ import {
   welcomeMessage,
   winningMessage,
 } from "./messages";
-import { setupPlayers, choosePosition, Player, playAgain } from "./prompts";
-import { GameStatus } from "./types";
+import { setupPlayers, choosePosition, playAgain } from "./prompts";
+import { GameStatus, Player } from "./types";
 import { getWinner } from "./win";
 
 async function run() {
@@ -40,6 +41,7 @@ const tictactoe = async (
   do {
     switch (currentPlayer.type) {
       case "Human":
+        // Human player gets to choose their own position
         const [xCoord, yCoord] = await choosePosition({
           board,
           icon: currentPlayer.token,
@@ -48,6 +50,7 @@ const tictactoe = async (
         board[yCoord][xCoord] = currentPlayer.token;
         break;
       case "Bot":
+        // Bot player will randomly select a position
         const [x, y] = pickRandomPosition(board);
         board[y][x] = currentPlayer.token;
         break;
@@ -81,8 +84,12 @@ const getGameStatus = async (
   try {
     return getWinner(board, firstPlayer, secondPlayer);
   } catch (err) {
-    const again = await playAgain();
-    return { status: "Draw", playAgain: again };
+    if (err instanceof Draw) {
+      const again = await playAgain();
+      return { status: "Draw", playAgain: again };
+    }
+
+    throw err;
   }
 };
 
