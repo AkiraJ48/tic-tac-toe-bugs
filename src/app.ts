@@ -33,7 +33,7 @@ const tictactoe = async (
 ) => {
   firstPlayerTurnMessage(firstPlayer.type === "Human");
 
-  let playAgain: boolean = false;
+  let playAgain;
   let currentPlayer = firstPlayer;
   let gameOver = false;
 
@@ -63,7 +63,7 @@ const tictactoe = async (
 
     if (gameStatus?.status === "Draw") {
       drawMessage();
-      playAgain = Boolean(gameStatus.playAgain);
+      playAgain = gameStatus.playAgain;
       gameOver = true;
     }
 
