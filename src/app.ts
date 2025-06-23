@@ -1,4 +1,4 @@
-import { Board, createBoard } from "./board";
+import { Board, createBoard, printFinalBoard } from "./board";
 import { pickRandomPosition } from "./bot";
 import { Draw } from "./errors";
 import {
@@ -56,15 +56,16 @@ const tictactoe = async (
         break;
     }
 
-    // @TODO: print the board if the bot wins
     const gameStatus = await getGameStatus(board, firstPlayer, secondPlayer);
 
     if (gameStatus?.status === "Win") {
+      printFinalBoard(board);
       winningMessage(gameStatus.type, currentPlayer.name);
       gameOver = true;
     }
 
     if (gameStatus?.status === "Draw") {
+      printFinalBoard(board);
       drawMessage();
       playAgain = gameStatus.playAgain;
       gameOver = true;

@@ -30,3 +30,8 @@
 ---
 
 Enjoy playing Tic Tac Toe from your terminal!
+
+## Controls
+
+- To place your token, you must use the left, right, up, and down arrow keys to navigate to the desired cell.
+- Press the enter key to place your token in the selected cell.
